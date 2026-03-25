@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing text or targetLang" });
     }
 
-    const response = await fetch("https://api-free.deepl.com/v2/translate", {
+    const response = await fetch("https://api.deepl.com/v2/translate", {
       method: "POST",
       headers: {
         "Authorization": "DeepL-Auth-Key 7f4fa647-93da-4aea-8c4f-f2c4b0cbc46b",
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    
+
     if (!data.translations || !data.translations[0]) {
       return res.status(500).json({ error: "DeepL returned no translations", raw: data });
     }
