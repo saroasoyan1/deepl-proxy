@@ -12,7 +12,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { text, targetLang } = req.body;
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const text = body.text;
+    const targetLang = body.targetLang;
+
+    if (!text || !targetLang) {
+      return res.status(400).json({ error: "Missing text or targetLang" });
+    }
 
     const response = await fetch("https://api-free.deepl.com/v2/translate", {
       method: "POST",
@@ -27,8 +33,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const translated = data.translations[0].text;
-    return res.status(200).json({ translatedText: translated });
+    
+    if (!data.translations || !data.translations[0]) {
+      return res.status(500).json({ error: "DeepL returned no translations", raw: data });
+    }
+
+    return res.status(200).json({ translatedText: data.translations[0].text });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
